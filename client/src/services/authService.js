@@ -1,19 +1,31 @@
-import { userLogin, userRegister } from "../redux/features/auth/authActions";
-import store from "../redux/store";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-export const handleLogin = (e, email, password, role) => {
-  e.preventDefault();
+const BASE_URL = process.env.REACT_APP_BASEURL;
+
+export const handleLogin = async (e, email, password, role) => {
   try {
-    if (!role || !email || !password) {
-      return alert("Please Provide All fields");
+    const { data } = await axios.post(`${BASE_URL}/auth/login`, {
+      email,
+      password,
+      role,
+    });
+
+    if (data?.success) {
+      localStorage.setItem("token", data?.token);
+      toast.success("Login successful!");
+      return { success: true };
+    } else {
+      toast.error(data?.message || "Login failed");
+      return { success: false };
     }
-    store.dispatch(userLogin({ email, password, role }));
   } catch (error) {
-    console.log(error);
+    toast.error(error?.response?.data?.message || "Login error");
+    return { success: false };
   }
 };
 
-export const handleRegister = (
+export const handleRegister = async (
   e,
   name,
   role,
@@ -25,22 +37,28 @@ export const handleRegister = (
   hospitalName,
   website
 ) => {
-  e.preventDefault();
   try {
-    store.dispatch(
-      userRegister({
-        name,
-        role,
-        email,
-        password,
-        phone,
-        organisationName,
-        address,
-        hospitalName,
-        website,
-      })
-    );
+    const { data } = await axios.post(`${BASE_URL}/auth/register`, {
+      name,
+      role,
+      email,
+      password,
+      phone,
+      organisationName,
+      address,
+      hospitalName,
+      website,
+    });
+
+    if (data?.success) {
+      toast.success("Registration successful!");
+      return { success: true };
+    } else {
+      toast.error(data?.message || "Registration failed");
+      return { success: false };
+    }
   } catch (error) {
-    console.log(error);
+    toast.error(error?.response?.data?.message || "Registration error");
+    return { success: false };
   }
 };
