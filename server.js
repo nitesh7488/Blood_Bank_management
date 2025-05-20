@@ -1,37 +1,50 @@
-// all your existing imports...
 const express = require("express");
-const dotenv = require("dotenv"); // ✅ Add this line
+const dotenv = require("dotenv");
 const colors = require("colors");
 const morgan = require("morgan");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db");
-// dot config
+
+// Load environment variables
 dotenv.config();
+
+// Connect to MongoDB
 connectDB();
 
-// rest object
+// Create Express app
 const app = express();
 
-// middlewares
+// Middleware: JSON parser
 app.use(express.json());
-app.use(cors());
+
+// ✅ Updated CORS Configuration
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // Local development
+      "https://blood-bank-management-1-ttrb.onrender.com", // 🔁 Replace with your deployed frontend URL
+    ],
+    credentials: true,
+  })
+);
+
+// HTTP request logger
 app.use(morgan("dev"));
 
-// root route
+// Root route
 app.get("/", (req, res) => {
   res.send("Welcome to the Blood Bank Management API");
 });
 
-// api routes
+// API Routes
 app.use("/api/v1/test", require("./routes/testRoutes"));
 app.use("/api/v1/auth", require("./routes/authRoutes"));
 app.use("/api/v1/inventory", require("./routes/inventoryRoutes"));
 app.use("/api/v1/analytics", require("./routes/analyticsRoutes"));
 app.use("/api/v1/admin", require("./routes/adminRoutes"));
 
-// ✅ Serve frontend in production
-const path = require("path");
-
+// ✅ Serve React frontend in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "./client/build")));
 
@@ -40,12 +53,13 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// port
+// Server port
 const PORT = process.env.PORT || 8080;
 
+// Start server
 app.listen(PORT, () => {
   console.log(
-    `Node Server Running In ${process.env.DEV_MODE} Mode On Port ${PORT}`
+    `Node Server Running In ${process.env.DEV_MODE || "production"} Mode On Port ${PORT}`
       .bgBlue.white
   );
 });
