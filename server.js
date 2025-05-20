@@ -1,5 +1,10 @@
 // all your existing imports...
-
+const express = require("express");
+const dotenv = require("dotenv"); // ✅ Add this line
+const colors = require("colors");
+const morgan = require("morgan");
+const cors = require("cors");
+const connectDB = require("./config/db");
 // dot config
 dotenv.config();
 connectDB();
