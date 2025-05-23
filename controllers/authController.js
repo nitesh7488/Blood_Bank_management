@@ -115,7 +115,7 @@ const loginController = async (req, res) => {
 
     // 4. Generate token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "1h",
     });
 
     // 5. Return response (filter sensitive data)
